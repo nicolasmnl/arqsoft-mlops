@@ -14,7 +14,7 @@ Para rodar o experimento e observar os resultados você deve seguir os seguintes
 
 1.
     ```
-    python distilbert-text-classifier.py
+    python distilbert-text-classification.py
     ```
 2. 
     ```
