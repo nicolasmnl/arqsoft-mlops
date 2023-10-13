@@ -19,8 +19,10 @@
 
 from sklearn.datasets import make_regression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
+import numpy as np
+import matplotlib as plt
 
 import mlflow
 import mlflow.sklearn
@@ -38,10 +40,16 @@ with mlflow.start_run() as run:
     # Infer the model signature
     y_pred = model.predict(X_test)
     signature = infer_signature(X_test, y_pred)
+    # Defining RMSE function
+    def root_mean_squared_error(actual, predictions):
+        return np.sqrt(mean_squared_error(actual, predictions))
 
     # Log parameters and metrics using the MLflow APIs
     mlflow.log_params(params)
     mlflow.log_metrics({"mse": mean_squared_error(y_test, y_pred)})
+    mlflow.log_metrics({"r2": r2_score(y_test, y_pred)})
+    mlflow.log_metrics({"rmse": root_mean_squared_error(y_test, y_pred)})
+    
 
     # Log the sklearn model and register as version 1
     mlflow.sklearn.log_model(
@@ -50,4 +58,3 @@ with mlflow.start_run() as run:
         signature=signature,
         registered_model_name="sk-learn-random-forest-reg-model",
     )
-
