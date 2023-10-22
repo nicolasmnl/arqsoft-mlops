@@ -27,13 +27,21 @@ y_pred = model.predict(X_test)
 
 prod_mse = mean_squared_error(y_test, y_pred)
 
-with mlflow.start_run() as run:
+experiment = mlflow.get_experiment_by_name("random_forest_train")
+
+with mlflow.start_run(experiment_id=experiment.experiment_id) as run:
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
     new_mse = mean_squared_error(y_test, y_pred)
 
+    # Defining RMSE function
+    def root_mean_squared_error(actual, predictions):
+        return np.sqrt(mean_squared_error(actual, predictions))
+
     mlflow.log_params(params)
     mlflow.log_metrics({"mse": mean_squared_error(y_test, y_pred)})
+    mlflow.log_metrics({"r2": r2_score(y_test, y_pred)})
+    mlflow.log_metrics({"rmse": root_mean_squared_error(y_test, y_pred)})
 
 new_run_id = run.info.run_id
 
